@@ -1,0 +1,14 @@
+body { margin:0; background: #FBF8FF; color:#1A1A1A; font: normal normal 12px/14px Arial,Helvetica,Sans-serif;}
+
+#header		{ background: url('../images/background-top.png') no-repeat  50% top ; height:250px; position:fixed; width:100%; z-index:-1000;}
+#logo		{ float:right; margin-right:20%; margin-top:100px; }
+
+	
+@media all and (max-width: 600px) and (min-width: 300px){
+  #logo	img	{ float:right; width:260px; height:84px; }
+
+}
+
+@media all and (max-width: 400px) {
+  #logo	img	{ float:right; width:195px; height:63px; }
+}

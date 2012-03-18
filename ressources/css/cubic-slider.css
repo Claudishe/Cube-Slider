@@ -1,0 +1,12 @@
+#CubicSlider {width:1100px; margin:auto;}
+
+#CubicSlider #myCanvas { display:inline-block; vertical-align:middle;}
+
+#CubicSlider #right { text-indent: -1000px; overflow:hidden; display:inline-block; vertical-align:middle; height:120px; width:120px; background: url('../images/slider-button.png') no-repeat -120px top;}
+#CubicSlider #left { text-indent: -1000px; overflow:hidden;  display:inline-block; vertical-align:middle; height:120px; width:120px; background: url('../images/slider-button.png') no-repeat left top;}
+
+#CubicSlider #right:hover { background-position: -120px -120px;}
+#CubicSlider #left:hover { text-indent: -1000px; background-position: 0px -120px;}
+
+#CubicSlider #right:active { background-position: -120px -240px;}
+#CubicSlider #left:active { background-position: 0px -240px;}

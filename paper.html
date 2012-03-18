@@ -1,0 +1,246 @@
+<html>
+
+<head>
+	<title>WildCube | Wild Cubic Slider</title>
+	<link rel="stylesheet" href="ressources/css/style.css" type="text/css" />
+	<link rel="stylesheet" href="ressources/css/cubic-slider.css" type="text/css"></link>
+
+</head>
+
+<body>
+	<div id="header">
+		<a id="logo" href="http://www.wildcu.be" title="Back to home">
+			<img src="ressources/images/logo.png" alt="WildCube" />
+		</a>
+	</div>
+	<div id="Content">
+	</div>
+	<script type="text/javascript" src="lib/paper.js" ></script>
+	<script type="text/paperscript" canvas="myCanvas">
+	
+	var direction = 'RightToLeft';
+	var locked = true;
+	var width= 940 - 160;
+	var perspectiveTop = 5;
+	var perspectiveBottom = 6;
+	var height=640 - 160;
+	var top = 150;
+	var left = 100;
+	var speed = 700;
+	var timeCounter = 0;
+	
+	var PathRectangleLeft;
+	var PathRectangleRight;
+	
+	var TriangleTopLeft;
+	var TriangleTopRight;
+	
+	var TriangleBottomLeft;
+	var TriangleBottomRight;
+
+	function CubicSlider(top,left,width,height,stroke,fillRect1, fillRect2)
+	{
+		function CreateSquare(top,left, width, height, stroke, fill)
+		{
+			var myRectangle = new Rectangle(left,top,width,height);
+			var myPathRectangle = new Path.Rectangle(myRectangle);
+			myPathRectangle.fillColor = fill;
+			//myPathRectangle.strokeColor = stroke;
+			return myPathRectangle;
+		}
+		
+		function CreateTriangle(top,left,width,height,fill)
+		{	
+			var point1 = new Point(left,top);
+			
+			var point2 = new Point(left+width,top);
+			var point3 = new Point(left,top);
+			console.log(point3);
+			var path = new Path.Line(point1,point2);
+			path.lineTo(point3);
+			path.lineTo(point1);
+			
+			path.fillColor = fill;
+			return path;
+		}
+		
+		PathRectangleLeft = CreateSquare(top,left,width,height,stroke,fillRect1);
+		PathRectangleRight = CreateSquare(top,left+width,0,height,stroke,fillRect2);
+		
+		TriangleTopLeft = CreateTriangle(top,left,width,0,fillRect1);
+		TriangleTopRight = CreateTriangle(top,left,0,0,fillRect2);
+		
+		TriangleBottomLeft = CreateTriangle(top+height,left,0,0, fillRect1 );
+		
+		TriangleBottomRight = CreateTriangle(top+height,left,width,0,fillRect2);
+
+	}
+	
+	// * * * * * * * * * //
+	// ==  animation  == //
+	
+	var deplacement = width*10/speed;
+	console.log(deplacement);
+
+
+	
+	function onFrame(event){
+		
+		
+		
+		if(still && play) timeCounter += 1;
+			
+		if (timeCounter >= stillTime) 
+		{
+			timeCounter = 0;
+			still = false;
+		}
+		
+		
+
+		if (!still || oneShot)
+		{
+
+			
+			var top = PathRectangleRight.segments[2];
+			var bottom = PathRectangleRight.segments[3];
+			
+
+			if (direction == 'leftToRight')
+			{
+				PathRectangleRight.segments[2].point.x = top.point.x = top.point.x+1;
+
+				if (top.point.y >= width) {
+					locked = true;
+				}
+			}
+			else 
+			{
+				//Deplacement from right to left
+				if(top.point.x > left){
+					var delta = top.point.x - deplacement;
+					if (delta < left ) delta = left;
+					// == TRIANGLE TOP == 
+					
+					TriangleTopRight.segments[1].point.x = width;
+					TriangleBottomRight.segments[3].point.x = width;
+					
+					TriangleTopLeft.segments[1].point.x =
+					TriangleTopLeft.segments[2].point.x  =
+					TriangleTopRight.segments[2].point.x =
+					TriangleTopRight.segments[3].point.x =
+					TriangleBottomLeft.segments[1].point.x = 
+					TriangleBottomLeft.segments[2].point.x = 
+					
+					TriangleBottomRight.segments[2].point.x = 
+					TriangleBottomRight.segments[1].point.x = 
+					// == RECTANGLES == 
+					top.point.x = bottom.point.x = delta;
+					
+					// == TRIANGLE TOP HEIGHT VARIATION
+
+					//TriangleTopRight.segments[3].point.x = 500;
+					
+					var variationX = 1 - ((top.point.x - left) / width);
+					var sinus = Math.sin(variationX*3.1416 + 2*3.1416)
+						
+					TriangleTopLeft.segments[2].point.y =
+					TriangleTopRight.segments[2].point.y  =
+					(top.point.y - sinus * width/perspectiveTop);
+					
+					TriangleBottomLeft.segments[2].point.y =
+					TriangleBottomRight.segments[2].point.y  =
+					(top.point.y + height + sinus * width/perspectiveBottom);
+						
+				
+					 //PathRectangleRight.opacity = (top.point.x - left)/width ;
+					 if (PathRectangleRight.opacity < 0) PathRectangleRight.opacity = 0;
+					
+				}
+				else {
+					//We reset the cube for the next transition
+					top.point.x = bottom.point.x = width+left;
+					PathRectangleRight.opacity = 1;
+					locked = true; 
+					timeCounter = 0;//From now we set the cube to still until it reaches the stillTime limit
+					still = true;
+					oneShot = false;
+					//Triangle reset
+						TriangleTopLeft.segments[1].point.x =
+						TriangleTopLeft.segments[2].point.x  = left;
+						TriangleTopRight.segments[2].point.x = width;
+						TriangleTopRight.segments[3].point.x = width;
+						TriangleBottomLeft.segments[1].point.x = 
+						TriangleBottomLeft.segments[2].point.x = left;
+						TriangleBottomRight.segments[2].point.x = 
+						TriangleBottomRight.segments[1].point.x = width;
+					}
+
+			}
+		}
+	}
+	
+	CubicSlider(top,left,width,height, '#CFCAAA', '#CFCAAA','#D8D4BC')
+	
+	
+
+</script>
+<script type="text/javascript">
+var play = true;
+var stillTime = 50;
+var still = true;
+var oneShot  = false;
+	function PlayPause(){
+		timeCounter = stillTime;
+		if(play){ 
+			play = false; 
+			still = false;
+		}
+		else{
+			play = true; 
+			still = true;
+		}
+		document.getElementById("state").innerHTML = play;
+	}
+	
+	function MoveCubeToRight(){
+		oneShot = true;
+		console.log('DIRECTION : ' + direction);
+		direction = 'leftToRight';
+		document.getElementById("direction").innerHTML = direction;
+		
+	}
+	
+	function MoveCubeToLeft(){
+		console.log('DIRECTION : ' + direction);
+		direction = 'rightToLeft';
+		document.getElementById("direction").innerHTML = direction;
+	}
+	
+  window.onload = function(){
+		console.log('onload');
+		document.getElementById("play").onclick = PlayPause;
+		document.getElementById("left").onclick = MoveCubeToLeft;
+		document.getElementById("right").onclick = MoveCubeToRight;
+	}
+	
+</script>
+
+<a id="play">Play / Pause</a>
+
+<br/>
+
+	<div id="CubicSlider">
+		<a id="left"><-- LEFT</a>
+		<canvas id="myCanvas" width="780" height="800"></canvas>
+		<a id="right">RIGHT --> </a>
+	</div>
+<br/>
+
+Direction : <div id="direction"></div>
+Play : <div id="state"></div>
+
+
+
+</body>
+</html>
